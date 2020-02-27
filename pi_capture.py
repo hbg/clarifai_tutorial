@@ -25,8 +25,8 @@ def predict(url):
 	return model.predict_by_url(url)
 
 def predict_by_file(fpath):
-  model = app.models.get('sbman')
-  return model.predict_by_filename(fpath)
+	model = app.models.get('sbman')
+	return model.predict_by_filename(fpath)
 
 
 def create_image_set(path, concepts, not_concepts):
@@ -38,19 +38,19 @@ def create_image_set(path, concepts, not_concepts):
 	return images
 
 if __name__ == "__main__":
-  i = 0
+	i = 0
 	if input("Train? ")[0].lower() == 'y':
 		train()
 	while True:
 		imgs = glob(os.path.join(ROOT_PREDICTION, '*.jpg'))
 		if len(imgs) == 0:
-		  camera = PiCamera()
-      camera.resolution = (1024, 768)
-      camera.start_preview()
-      camera.capture('{}.jpg'.format(i))
+			camera = PiCamera()
+			camera.resolution = (1024, 768)
+			camera.start_preview()
+			camera.capture('prediction/{}.jpg'.format(i))
 		else:
-		  print("Om nom nom")
-		  print(predict_by_file(imgs[0]))
-		  os.remove(imgs[0])
+			print("Om nom nom")
+			print(predict_by_file(imgs[0]))
+			os.remove(imgs[0])
 		time.sleep(3.0)
-    i += 1
+	i += 1
