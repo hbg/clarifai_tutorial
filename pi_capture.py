@@ -3,11 +3,12 @@ from clarifai.rest import Image as ClImage
 from glob import glob
 import os
 import time
+import RPi_I2C_driver as i2c
 from picamera import PiCamera
 ROOT = os.getcwd() + '/training/'
 ROOT_PREDICTION = os.getcwd() + '/prediction/'
-app = ClarifaiApp(api_key="c52037fe09f14d559e2e11857bfba297")
-
+app = ClarifaiApp(api_key="77ffb4a76be24b7e980b29ca43227ebb")
+lcd = i2c.lcd()
 def train():
 	app.inputs.delete_all()
 	folders = ["superman", "batman"] # Lists out all categories
@@ -41,16 +42,19 @@ if __name__ == "__main__":
 	i = 0
 	if input("Train? ")[0].lower() == 'y':
 		train()
+	camera = PiCamera()
 	while True:
 		imgs = glob(os.path.join(ROOT_PREDICTION, '*.jpg'))
+		print(imgs)
 		if len(imgs) == 0:
-			camera = PiCamera()
-			camera.resolution = (1024, 768)
-			camera.start_preview()
+			camera.resolution = (100, 100)
 			camera.capture('prediction/{}.jpg'.format(i))
 		else:
 			print("Om nom nom")
-			print(predict_by_file(imgs[0]))
+			results = predict_by_file(imgs[0])['outputs'][0]['data']['concepts']
+			i_r = lambda x: '{}: {}'.format(x['id'], x['value'])
+			print(list(map(i_r, results)))
 			os.remove(imgs[0])
-		time.sleep(3.0)
-	i += 1
+			lcd.lcd_display_string(''.join(list(map(i_r, results))), 1)
+		time.sleep(5.0)
+		i += 1
