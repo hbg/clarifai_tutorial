@@ -1,10 +1,6 @@
 import RPi.GPIO as GPIO
 import time
 import os
-from glob import glob
-from picamera import PiCamera
-from PIL import Image, ImageDraw
-
  
 #GPIO Mode (BOARD / BCM)
 GPIO.setmode(GPIO.BCM)
@@ -16,18 +12,8 @@ GPIO_ECHO = 24
 #set GPIO direction (IN / OUT)
 GPIO.setup(GPIO_TRIGGER, GPIO.OUT)
 GPIO.setup(GPIO_ECHO, GPIO.IN)
-TRAINING_ROOT = '/home/pi/clarifai_tutorial/training_us/'
+TRAINING_ROOT = '/home/pi/training/'
 map_values = []
-
-def object_center(i):
-    cam = PiCamera()
-    cam.resolution = (500, 500)
-    PATH = '/home/pi/clarifai_tutorial/captures/{}.jpg'.format(i)
-    cam.capture(PATH)
-    im = Image.open(PATH).convert('RGBA')
-    id = ImageDraw.Draw(im)
-    id.point([(250,250)], 0)
-    im.save(PATH)
  
 def distance():
     # set Trigger to HIGH
@@ -65,10 +51,8 @@ if __name__ == '__main__':
  
         # Reset by pressing CTRL + C
     except KeyboardInterrupt:
-        i = len(glob(TRAINING_ROOT))
-        print(i)
-        f = open('{}{}.txt'.format(TRAINING_ROOT, str(i+1)), 'w+')
-        f.write(str(map_values))
-        f.close()
-        object_center(str(i+1))
+        i = len(os.listdir(TRAINING_ROOT))
+            	with open('{}{}.jpg'.format(TRAINING_ROOT, i)) as f:
+		f.write(str(map_values))
+		f.close()
         GPIO.cleanup()
